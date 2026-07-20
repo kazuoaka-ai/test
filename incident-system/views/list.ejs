@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>提出データ一覧</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        .btn-edit { background-color: #ffc107; color: black; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-weight: bold; }
+    </style>
+</head>
+<body>
+<!-- views/list.ejs の見出し（h1）の下に挿入 -->
+<h1>📋 提出済みインシデントレポート一覧</h1>
+<div style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
+    <a href="/">🏠 メニューに戻る</a>
+</div>
+    <table>
+        <thead>
+            <tr>
+                <th>レベル</th>
+                <th>提出日</th>
+                <th>発生日時</th>
+                <th>部署 / 提出者</th>
+                <th>出来事の領域</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% incidents.forEach(item => { %>
+                <tr>
+                    <td><strong>レベル <%= item.level %></strong></td>
+                    <td><%= item.reportDate ? item.reportDate.toISOString().split('T')[0] : '' %></td>
+                    <td><%= item.occurrenceDate ? item.occurrenceDate.toLocaleString('ja-JP') : '' %></td>
+                    <td><%= item.reporter.department %> / <%= item.reporter.name %></td>
+                    <td><%= item.eventCategory %></td>
+                    <td>
+                        <!-- 特定のデータIDをURLに含めて修正画面へ遷移します -->
+                        <a href="/incident/edit/<%= item._id %>" class="btn-edit">✏️ 修正する</a>
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+<!-- ⭕ 修正後：パスワード保護付きのCSV出力ボタン -->
+<a href="/api/incident/export/csv" 
+   onclick="return verifyCsvPassword();" 
+   style="background-color: #28a745; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 0.9em;">
+   📥 全データをCSVで出力
+</a>
+
+<!-- 👇 画面最下部など（</body>の直前）に以下のスクリプトを追記してください -->
+<script>
+    function verifyCsvPassword() {
+        // ブラウザ標準のパスワード入力ポップアップを表示
+        const password = prompt("CSVを出力するには、閲覧用パスワードを入力してください：");
+        
+        // キャンセルされた場合、または空欄の場合
+        if (password === null) {
+            return false; 
+        }
+        
+        // パスワードが一致した場合のみ通信を進める
+        if (password === "kon") {
+            alert("認証に成功しました。CSVのダウンロードを開始します。");
+            return true;
+        } else {
+            // 不一致の場合はブロック
+            alert("パスワードが間違っています。ダウンロードを中止しました。");
+            return false;
+        }
+    }
+</script>
+
+</body>
+</html>
+
