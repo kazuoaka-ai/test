@@ -1,4 +1,0 @@
-<form action="/search-target" method="GET">
-    <input type="text" name="keyword" placeholder="名前 または ID を入力">
-    <button type="submit">検索</button>
-</form>
